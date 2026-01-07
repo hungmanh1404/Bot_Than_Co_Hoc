@@ -176,10 +176,15 @@ Ví dụ: `/dubao 15/01/2026`
         self.scheduler = ForecastScheduler(self)
         self.scheduler.start()
         
-        # Start the bot
+        # Initialize the application
         await self.application.initialize()
         await self.application.start()
-        await self.application.updater.start_polling()
+        
+        # Start polling (compatible with v21)
+        await self.application.updater.start_polling(
+            allowed_updates=Update.ALL_TYPES,
+            drop_pending_updates=True
+        )
         
         logger.info("Telegram bot started successfully")
     
@@ -188,7 +193,10 @@ Ví dụ: `/dubao 15/01/2026`
         if self.scheduler:
             self.scheduler.stop()
         
-        await self.application.updater.stop()
+        # Stop polling and shutdown
+        if self.application.updater and self.application.updater.running:
+            await self.application.updater.stop()
+        
         await self.application.stop()
         await self.application.shutdown()
         
