@@ -21,12 +21,15 @@ class TelegramBot:
     
     def __init__(self):
         """Initialize the Telegram Bot"""
-        # Build application without job_queue (we use APScheduler instead)
-        # This fixes Python 3.13 weakref compatibility issue
+        # Build application WITHOUT job_queue (we use APScheduler instead)
+        # Setting job_queue=None fixes Python 3.13 weakref compatibility issue
+        from telegram.ext import JobQueue
+        
         self.application = (
             Application.builder()
             .token(settings.TELEGRAM_BOT_TOKEN)
             .arbitrary_callback_data(True)
+            .job_queue(None)  # Disable JobQueue completely
             .build()
         )
         self.scheduler = None
