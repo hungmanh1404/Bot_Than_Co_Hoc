@@ -21,7 +21,14 @@ class TelegramBot:
     
     def __init__(self):
         """Initialize the Telegram Bot"""
-        self.application = Application.builder().token(settings.TELEGRAM_BOT_TOKEN).build()
+        # Build application without job_queue (we use APScheduler instead)
+        # This fixes Python 3.13 weakref compatibility issue
+        self.application = (
+            Application.builder()
+            .token(settings.TELEGRAM_BOT_TOKEN)
+            .arbitrary_callback_data(True)
+            .build()
+        )
         self.scheduler = None
         
         # Register command handlers
